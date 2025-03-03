@@ -1,27 +1,22 @@
-import Koa from "koa"
-import Router from "koa-router"
-import { readdirSync, readFileSync, statSync } from "node:fs"
+import Koa from 'koa'
+import Router from 'koa-router'
+import { readdirSync, readFileSync, statSync } from 'fs'
 
-const router = new Router()
+const router = new Router().post('/search', async ({ request, response }) => {
+  const c = request.query.category as 'books' | 'movies' | 'music'
+  const q = request.query.term as string
 
-router.post('/search', async ({request, response}) => {
-    const c = request.query.category as 'books' | 'movies' | 'musics'
-    const q = request.query.term as string
-
-    try {
-        const files = searchFilesInCategory(c, q)
-        response.body = JSON.stringify({ files })
-        response.type = 'json'
-    } catch (error) {
-        response.body = JSON.stringify({ error })
-        response.type = 'json'
-    }
+  try {
+    response.body = { files: searchFilesInCategory(c, q) }
+  } catch (error) {
+    response.body = { error: String(error) }
+  }
 })
 
-function searchFilesInCategory(c: 'books' | 'movies' | 'musics', q: string): string[] {
-    return readdirSync(`./data/${c}`)
-        .filter((x: string) => statSync(`./data/${c}/${x}`).isFile())
-        .filter((x: string) => readFileSync(`./data/${c}/${x}`, 'utf-8').toLowerCase().includes(q.toLowerCase()))
+function searchFilesInCategory(c: 'books' | 'movies' | 'music', q: string): string[] {
+  return readdirSync(`./data/${c}`)
+    .filter(x => statSync(`./data/${c}/${x}`).isFile())
+    .filter(x => readFileSync(`./data/${c}/${x}`, 'utf-8').includes(q.toLowerCase()))
 }
 
-new Koa().use(router.routes()).listen(8080, () => {})
+new Koa().use(router.routes()).listen(80)
