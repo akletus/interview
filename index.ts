@@ -1,6 +1,6 @@
 import Koa from 'koa'
 import Router from 'koa-router'
-import { readdirSync, readFileSync, statSync } from 'fs'
+import { readdirSync, readFileSync } from 'fs'
 
 const router = new Router().post('/search', async ({ request, response }) => {
   const c = request.query.category as 'books' | 'movies' | 'music'
@@ -14,9 +14,8 @@ const router = new Router().post('/search', async ({ request, response }) => {
 })
 
 function searchFilesInCategory(c: 'books' | 'movies' | 'music', q: string): string[] {
-  return readdirSync(`./data/${c}`)
-    .filter(x => statSync(`./data/${c}/${x}`).isFile())
-    .filter(x => readFileSync(`./data/${c}/${x}`, 'utf-8').includes(q.toLowerCase()))
+  const files = readdirSync(`./data/${c}`)
+  return files.filter(x => readFileSync(`./data/${c}/${x}`, 'utf-8').includes(q.toLowerCase()))
 }
 
 new Koa().use(router.routes()).listen(80)
