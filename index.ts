@@ -13,9 +13,9 @@ const router = new Router().post('/search', async ({ request, response }) => {
   }
 })
 
-function searchFilesInCategory(c: 'books' | 'movies' | 'music', q: string): string[] {
-  const files = readdirSync(`./data/${c}`)
-  return files.filter(x => readFileSync(`./data/${c}/${x}`, 'utf-8').includes(q.toLowerCase()))
+function searchFilesInCategory(category: 'books' | 'movies' | 'music', keyword: string): string[] {
+  const files = readdirSync(`./data/${category}`)
+  return files.filter(x => readFileSync(`./data/${category}/${x}`, 'utf-8').includes(keyword.toLowerCase()))
 }
 
 new Koa().use(router.routes()).listen(80)
